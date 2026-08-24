@@ -768,7 +768,7 @@
             if (!apiKey) return "⚠️ Please add your Gemini API Key in Settings (Brain Icon).";
 
             const usePro = document.getElementById('pro-toggle').checked;
-            const model = usePro ? "gemini-1.5-pro" : "gemini-1.5-flash";
+            const model = usePro ? "gemini-2.5-pro" : "gemini-2.5-flash";
             
             const activityText = profile.activityLevel == 1.2 ? "Sedentary" : (profile.activityLevel == 1.375 ? "Lightly Active" : (profile.activityLevel == 1.55 ? "Moderately Active" : "Highly Active"));
             const goalText = profile.goal === 'lose' ? `Lose Weight (Deficit: ${profile.pace} kcal)` : (profile.goal === 'gain' ? `Build Muscle (Surplus: ${profile.pace} kcal)` : `Maintain Weight`);
