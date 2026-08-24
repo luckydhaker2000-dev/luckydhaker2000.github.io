@@ -56,14 +56,14 @@
         
         .typing-indicator span { display: inline-block; width: 8px; height: 8px; background-color: #cbd5e1; border-radius: 50%; margin: 0 2px; animation: bounce 1.4s infinite ease-in-out both; }
         .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-    .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
-    @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
     
-    #app-container { transition: filter 0.4s ease; display: block; opacity: 1; }
-    .modal-active #app-container { filter: blur(8px) brightness(0.9); pointer-events: none; }
+        #app-container { transition: filter 0.4s ease; display: block; opacity: 1; }
+        .modal-active #app-container { filter: blur(8px) brightness(0.9); pointer-events: none; }
     
-    /* Floating Nav */
-    .bottom-nav { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.5); box-shadow: 0 -10px 40px rgba(0,0,0,0.05); }
+        /* Floating Nav */
+        .bottom-nav { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.5); box-shadow: 0 -10px 40px rgba(0,0,0,0.05); }
     </style>
     <link rel="manifest" href="manifest.json">
 </head>
@@ -78,8 +78,8 @@
                 </div>
                 <div>
                     <h1 class="text-lg font-extrabold text-slate-900 tracking-tight leading-tight">Hi, Lucky!</h1>
-                    <div id="cloud-sync-status" class="text-[10px] font-bold text-indigo-600 uppercase tracking-wider flex items-center">
-                        <i class="fas fa-cloud-arrow-up mr-1.5"></i> Cloud Synced
+                    <div id="cloud-sync-status" class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider flex items-center">
+                        <i class="fas fa-mobile-screen mr-1.5"></i> Device Synced
                     </div>
                 </div>
             </div>
@@ -224,7 +224,7 @@
                 <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-white rounded-t-[32px] sm:rounded-t-3xl">
                     <div>
                         <h2 class="text-lg font-black text-slate-800 flex items-center"><i class="fas fa-robot text-indigo-500 mr-2"></i> Pro Coach</h2>
-                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wide">Gemini 3.1 Extended</p>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wide">Gemini 1.5 Pro</p>
                     </div>
                     <button onclick="window.closeModals()" class="text-slate-400 hover:text-slate-800 w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full transition"><i class="fas fa-times"></i></button>
                 </div>
@@ -294,7 +294,7 @@
             <div class="bg-white rounded-t-[32px] sm:rounded-3xl p-6 w-full max-w-md shadow-2xl relative flex flex-col max-h-[90vh]">
                 <button onclick="window.closeModals()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-800 w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full"><i class="fas fa-times"></i></button>
                 <h2 class="text-xl font-black text-slate-800 mb-1 flex items-center"><i class="fas fa-brain text-indigo-500 mr-2"></i>AI Settings</h2>
-                <p class="text-xs text-slate-500 mb-6 font-medium">Configure Gemini 3.1 Pro Extended capabilities.</p>
+                <p class="text-xs text-slate-500 mb-6 font-medium">Configure Gemini AI capabilities.</p>
                 
                 <div class="space-y-5">
                     <div>
@@ -413,11 +413,10 @@
     <script type="module">
 
         // State Variables
-        let userId = null;
         let profile = { 
             name: 'Lucky', email: '', sex: 'male', age: 19, height: 175, activityLevel: 1.2,
             goal: 'lose', pace: 500,
-            weightHistory: [] // Array of {date, weight} for the chart
+            weightHistory: [] 
         };
         let todayLog = { date: '', eatenCalories: 0, activeCalories: 0, waterMl: 0, fastingStart: null, macros: { p: 0, c: 0, f: 0 } };
         let fastingIntervalId = null;
@@ -425,33 +424,17 @@
 
         // Date Helper
         const getTodayStr = () => {
-            // Force Indian Standard Time for precise daily resets
             const options = { timeZone: 'Asia/Calcutta', year: 'numeric', month: '2-digit', day: '2-digit' };
-            const formatter = new Intl.DateTimeFormat('en-CA', options); // en-CA gives YYYY-MM-DD
+            const formatter = new Intl.DateTimeFormat('en-CA', options);
             return formatter.format(new Date());
         };
 
         // Initialize App Silently in Background
-    async function initApp() {
-        // FIX: Show app instantly! Mobile browsers block Firebase in preview, causing infinite white screen.
-        const appCont = document.getElementById('app-container');
-        appCont.style.display = 'block';
-        appCont.style.opacity = '1';
-        
-        // Render UI immediately so it doesn't wait for cloud
-        updateUI();
-        setTimeout(initChart, 100);
-
-        try {
-            if (customToken) {
-                const cred = await signInWithCustomToken(auth, customToken);
-                userId = cred.user.uid;
-            } else {
-                const cred = await signInAnonymously(auth);
-                userId = cred.user.uid;
-            }
+        async function initApp() {
+            const appCont = document.getElementById('app-container');
+            appCont.style.display = 'block';
+            appCont.style.opacity = '1';
             
-            profile.email = 'lucky@prohealth.app';
             // Add initial weight if empty
             if(profile.weightHistory.length === 0) {
                 profile.weightHistory.push({date: getTodayStr(), weight: 70});
@@ -459,33 +442,36 @@
             
             await loadData();
 
-        } catch (error) {
-            console.error("Auth error", error);
-            // Proceed offline safely if internet is down or strictly blocked by mobile
-            document.getElementById('cloud-sync-status').innerHTML = '<i class="fas fa-cloud-arrow-down mr-1.5 text-rose-500"></i> <span class="text-rose-500">Offline Mode</span>';
+            // Load saved API key from storage into Settings input
+            const savedKey = localStorage.getItem('geminiApiKey');
+            if(savedKey) {
+                document.getElementById('api-key-input').value = savedKey;
+            }
+
+            // Render UI
+            updateUI();
+            setTimeout(initChart, 100);
         }
-    }
 
-    // Start app automatically on load
-    initApp();
+        // Start app automatically on load
+        initApp();
 
-    async function loadData() {
-            if(!userId) return;
+        async function loadData() {
             const todayStr = getTodayStr();
             try {
-                // Load Profile
-                const profileSnap = await getDoc(doc(db, 'artifacts', appId, 'users', userId));
-                if (profileSnap.exists()) profile = { ...profile, ...profileSnap.data() };
+                // Load offline Profile data
+                const savedProfile = localStorage.getItem('luckyProfile');
+                if (savedProfile) profile = { ...profile, ...JSON.parse(savedProfile) };
                 
                 // Ensure weight history is sorted
                 if(profile.weightHistory) {
                     profile.weightHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
                 }
                 
-                // Load Today's Log
-                const logSnap = await getDoc(doc(db, 'artifacts', appId, 'users', userId, 'logs', todayStr));
-                if (logSnap.exists()) {
-                    todayLog = { ...todayLog, ...logSnap.data() };
+                // Load Today's Log offline
+                const savedLog = localStorage.getItem('luckyLog_' + todayStr);
+                if (savedLog) {
+                    todayLog = { ...todayLog, ...JSON.parse(savedLog) };
                 } else {
                     todayLog = { date: todayStr, eatenCalories: 0, activeCalories: 0, waterMl: 0, fastingStart: profile.lastFastingStart || null, macros: { p: 0, c: 0, f: 0 } };
                 }
@@ -494,15 +480,14 @@
                 updateUI();
                 updateChart();
             } catch (error) {
-                console.error("Failed to load cloud data", error);
+                console.error("Failed to load local data", error);
             }
         }
 
         async function saveData() {
-            if (!userId) return;
             try {
-                await setDoc(doc(db, 'artifacts', appId, 'users', userId), profile);
-                await setDoc(doc(db, 'artifacts', appId, 'users', userId, 'logs', todayLog.date), todayLog);
+                localStorage.setItem('luckyProfile', JSON.stringify(profile));
+                localStorage.setItem('luckyLog_' + todayLog.date, JSON.stringify(todayLog));
             } catch (e) { console.error("Save error", e); }
         }
 
@@ -522,7 +507,7 @@
             let offset = 0;
             if (profile.goal === 'lose') offset = -(profile.pace || 500);
             else if (profile.goal === 'gain') offset = (profile.pace || 500);
-            else offset = 0; // maintain
+            else offset = 0; 
             
             const dailyTarget = maintenance + offset;
             
@@ -533,7 +518,6 @@
             const { maintenance, dailyTarget } = calculateTDEE();
             const currentWeight = getLatestWeight();
             
-            // Allow active calories to increase daily allowance safely
             const totalTarget = dailyTarget + todayLog.activeCalories;
             const remaining = totalTarget - todayLog.eatenCalories;
             
@@ -566,7 +550,7 @@
             const waterPercent = Math.min(100, (todayLog.waterMl / 3000) * 100);
             document.getElementById('water-level').style.height = `${waterPercent}%`;
             
-            // Macros (Fail-safe for older logs)
+            // Macros
             const proteinTarget = Math.round(currentWeight * 1.5); 
             const fatTarget = Math.round((totalTarget * 0.25) / 9); 
             const carbTarget = Math.round((totalTarget - (proteinTarget*4) - (fatTarget*9)) / 4);
@@ -600,9 +584,8 @@
         function initChart() {
             const ctx = document.getElementById('weightChart').getContext('2d');
             
-            // Gradient fill for the line chart
             const gradient = ctx.createLinearGradient(0, 0, 0, 150);
-            gradient.addColorStop(0, 'rgba(99, 102, 241, 0.4)'); // Indigo 500 with opacity
+            gradient.addColorStop(0, 'rgba(99, 102, 241, 0.4)'); 
             gradient.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
             
             weightChartInstance = new Chart(ctx, {
@@ -621,7 +604,7 @@
                         pointRadius: 4,
                         pointHoverRadius: 6,
                         fill: true,
-                        tension: 0.4 // Smooth curves
+                        tension: 0.4
                     }]
                 },
                 options: {
@@ -630,7 +613,7 @@
                     plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(15, 23, 42, 0.9)' } },
                     scales: {
                         x: { display: false, grid: { display: false } },
-                        y: { display: false, grid: { display: false }, min: 65, max: 80 } // Dynamically updated later
+                        y: { display: false, grid: { display: false }, min: 65, max: 80 }
                     },
                     interaction: { mode: 'nearest', axis: 'x', intersect: false }
                 }
@@ -641,7 +624,6 @@
         function updateChart() {
             if(!weightChartInstance || !profile.weightHistory || profile.weightHistory.length === 0) return;
             
-            // Get last 14 entries for a clean view
             const recentData = profile.weightHistory.slice(-14);
             const labels = recentData.map(entry => {
                 const d = new Date(entry.date);
@@ -752,7 +734,6 @@
             const d = document.getElementById('weight-date').value;
             if (w && w > 0 && d) {
                 if(!profile.weightHistory) profile.weightHistory = [];
-                // Check if date exists, update if so, else push
                 const existingIndex = profile.weightHistory.findIndex(entry => entry.date === d);
                 if(existingIndex >= 0) {
                     profile.weightHistory[existingIndex].weight = w;
@@ -782,12 +763,18 @@
             }
         };
 
+        // THE CORRECT GEMINI API FUNCTION
         async function callGeminiAPI(promptText) {
             const apiKey = document.getElementById('api-key-input').value;
-            if (!apiKey) return "Please add your Gemini API Key in Settings (Brain Icon) to use Pro features.";
+            
+            // Validate the key actually looks like a Google API key
+            if (!apiKey || !apiKey.startsWith('AIza')) {
+                return "⚠️ Please add a valid Gemini API Key (starts with 'AIza') in the Settings (Brain Icon) to use the AI Coach.";
+            }
 
             const usePro = document.getElementById('pro-toggle').checked;
-            const model = usePro ? "gemini-1.5-pro-latest" : "gemini-1.5-flash-latest";
+            // Fixed Model Names
+            const model = usePro ? "gemini-1.5-pro" : "gemini-1.5-flash";
             
             const activityText = profile.activityLevel == 1.2 ? "Sedentary" : (profile.activityLevel == 1.375 ? "Lightly Active" : (profile.activityLevel == 1.55 ? "Moderately Active" : "Highly Active"));
             const goalText = profile.goal === 'lose' ? `Lose Weight (Deficit: ${profile.pace} kcal)` : (profile.goal === 'gain' ? `Build Muscle (Surplus: ${profile.pace} kcal)` : `Maintain Weight`);
@@ -811,11 +798,24 @@ RULES:
                         contents: [{ parts: [{ text: promptText }] }]
                     })
                 });
+                
                 const data = await response.json();
-                return data.candidates[0].content.parts[0].text;
+                
+                // Enhanced error catching directly from Google
+                if (data.error) {
+                    return `⚠️ Google API Error: ${data.error.message}`;
+                }
+                
+                if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+                     return data.candidates[0].content.parts[0].text;
+                } else if (data.candidates && data.candidates[0]?.finishReason) {
+                     return `⚠️ Response blocked by safety settings. Reason: ${data.candidates[0].finishReason}`;
+                }
+                
+                return "⚠️ Received an empty response from the server.";
             } catch (e) {
                 console.error(e);
-                return "Connection to Gemini failed. Check your API key.";
+                return "⚠️ Connection to Gemini failed. Check your internet connection.";
             }
         }
 
@@ -828,6 +828,7 @@ RULES:
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
+        // THE CORRECT SMART CHAT SENDER
         window.sendChatMessage = async () => {
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
@@ -878,13 +879,13 @@ RULES:
 
             addChatMessage('ai', cleanResponse);
         };
-window.openChatModal = () => window.openModals('chat-modal');
-window.openFoodModal = () => window.openModals('food-modal');
+        
         window.openModals = (id) => {
             document.querySelectorAll('[id$="-modal"]').forEach(m => m.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
             document.body.classList.add('modal-active');
         };
+        
         window.closeModals = () => {
             document.querySelectorAll('[id$="-modal"]').forEach(m => m.classList.add('hidden'));
             document.body.classList.remove('modal-active');
@@ -893,6 +894,7 @@ window.openFoodModal = () => window.openModals('food-modal');
         window.openFoodModal = () => openModals('food-modal');
         window.openChatModal = () => openModals('chat-modal');
         window.openSettingsModal = () => openModals('settings-modal');
+        
         window.openWeightModal = () => {
             document.getElementById('weight-date').value = getTodayStr();
             document.getElementById('weight-input').value = getLatestWeight();
@@ -900,62 +902,11 @@ window.openFoodModal = () => window.openModals('food-modal');
         };
 
         window.saveSettings = () => {
+            const key = document.getElementById('api-key-input').value;
+            localStorage.setItem('geminiApiKey', key);
             window.closeModals();
-            // Assuming the UI inputs bound directly to variables when used.
         };
 
-        window.sendChatMessage = async function() {
-            const input = document.getElementById('chat-input');
-            const container = document.getElementById('chat-messages');
-            const userText = input.value.trim();
-            
-            if (!userText) return;
-
-            container.innerHTML += `
-                <div class="flex justify-end mb-3">
-                    <div class="bg-indigo-600 text-white p-3 rounded-2xl rounded-tr-none max-w-[80%] text-sm font-medium shadow-sm">
-                        ${userText}
-                    </div>
-                </div>`;
-            
-            input.value = '';
-            container.scrollTop = container.scrollHeight;
-
-            const GEMINI_API_KEY = "AQ.Ab8RN6INLr16gqSQV-82kKhe19lnGNb6r2ECJJZ06kbVNzHR-w"; 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent?key=${GEMINI_API_KEY}`;
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: userText }] }]
-                    })
-                });
-
-                const data = await response.json();
-                const aiReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "I received an empty response from the server.";
-
-                container.innerHTML += `
-                    <div class="flex justify-start mb-3">
-                        <div class="bg-white text-slate-800 p-3 rounded-2xl rounded-tl-none max-w-[80%] text-sm font-medium shadow-sm border border-slate-100">
-                            ${aiReply}
-                        </div>
-                    </div>`;
-                    
-            } catch (error) {
-                console.error("Gemini Connection Error:", error);
-                container.innerHTML += `
-                    <div class="flex justify-start mb-3">
-                        <div class="bg-red-50 text-red-600 p-3 rounded-2xl rounded-tl-none max-w-[80%] text-sm font-medium shadow-sm border border-red-100">
-                            Connection to Gemini failed. Check your API key or network connection.
-                        </div>
-                    </div>`;
-            }
-
-            container.scrollTop = container.scrollHeight;
-        };
     </script>
-
 </body>
 </html>
