@@ -892,7 +892,8 @@ RULES:
 
             addChatMessage('ai', cleanResponse);
         };
-
+window.openChatModal = () => window.openModals('chat-modal');
+window.openFoodModal = () => window.openModals('food-modal');
         window.openModals = (id) => {
             document.querySelectorAll('[id$="-modal"]').forEach(m => m.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
@@ -934,9 +935,8 @@ RULES:
             input.value = '';
             container.scrollTop = container.scrollHeight;
 
-            const GEMINI_API_KEY = "AQ.Ab8RN6INLr16gqSQV-82kKhe19lnGNb6r2ECJJZ06kbVNzHR-w
-                "; 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+            const GEMINI_API_KEY = "AQ.Ab8RN6INLr16gqSQV-82kKhe19lnGNb6r2ECJJZ06kbVNzHR-w"; 
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent?key=${GEMINI_API_KEY}`;
 
             try {
                 const response = await fetch(url, {
