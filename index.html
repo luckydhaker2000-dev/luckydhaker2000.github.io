@@ -916,10 +916,7 @@ RULES:
             window.closeModals();
             // Assuming the UI inputs bound directly to variables when used.
         };
-<!-- All your other app code above this -->
 
-    <script>
-        // PASTE YOUR JAVASCRIPT CODE HERE INSIDE THESE SCRIPT TAGS
         window.sendChatMessage = async function() {
             const input = document.getElementById('chat-input');
             const container = document.getElementById('chat-messages');
@@ -937,7 +934,8 @@ RULES:
             input.value = '';
             container.scrollTop = container.scrollHeight;
 
-            const GEMINI_API_KEY = "YOUR_API_KEY_HERE"; 
+            const GEMINI_API_KEY = "AQ.Ab8RN6INLr16gqSQV-82kKhe19lnGNb6r2ECJJZ06kbVNzHR-w
+                "; 
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
             try {
